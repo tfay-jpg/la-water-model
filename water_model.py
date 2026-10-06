@@ -39,19 +39,19 @@ st.markdown("## 💰 Step 1: Allocate Your $10 Billion Capital Budget")
 c1, c2 = st.columns(2)
 
 with c1:
-    b_cons = st.slider("1. Demand Reduction & Conservation ($M)", 0, 10000, 1500, step=250, 
+    b_cons = st.slider("1. Demand Reduction & Conservation ($M)", 0, 10000, 0, step=250, 
                        help="CapEx: $2,500/AF | O&M: $350/AF | $1B = 400,000 AFY saved")
-    b_storm = st.slider("2. Stormwater Capture & Green Infra ($M)", 0, 10000, 1500, step=250, 
+    b_storm = st.slider("2. Stormwater Capture & Green Infra ($M)", 0, 10000, 0, step=250, 
                         help="CapEx: $10,000/AF | O&M: $900/AF | $1B = 100,000 AFY yield")
-    b_gw_recharge = st.slider("3. Groundwater Recharge & Aquifer Banking ($M)", 0, 10000, 1500, step=250, 
+    b_gw_recharge = st.slider("3. Groundwater Recharge & Aquifer Banking ($M)", 0, 10000, 0, step=250, 
                              help="CapEx: $6,000/AF | O&M: $650/AF | $1B = 166,666 AFY storage capacity")
 
 with c2:
-    b_storage = st.slider("4. Surface Storage Expansion / Reservoirs ($M)", 0, 10000, 1000, step=250, 
+    b_storage = st.slider("4. Surface Storage Expansion / Reservoirs ($M)", 0, 10000, 0, step=250, 
                           help="CapEx: $12,000/AF | O&M: $500/AF | $1B = 83,333 AF atmospheric river buffer")
-    b_rec = st.slider("5. Water Recycling / Potable Reuse ($M)", 0, 10000, 3500, step=250, 
+    b_rec = st.slider("5. Water Recycling / Potable Reuse ($M)", 0, 10000, 0, step=250, 
                       help="CapEx: $16,000/AF | O&M: $1,850/AF | $1B = 62,500 AFY drought-proof yield")
-    b_desal = st.slider("6. Ocean Desalination Buildout ($M)", 0, 10000, 1000, step=250, 
+    b_desal = st.slider("6. Ocean Desalination Buildout ($M)", 0, 10000, 0, step=250, 
                         help="CapEx: $25,000/AF | O&M: $3,000/AF | $1B = 40,000 AFY yield")
 
 # Budget Accounting
@@ -80,7 +80,6 @@ with s_col2:
     precip_var = st.slider("Precipitation Variability / Chaos (%)", 0, 100, 30, step=5)
 
 # ENGINE LOGIC & CAPACITY CALCULATIONS
-# Convert Capital Spending ($M) to Physical Yield/Capacity (AFY) via CapEx metrics
 afy_saved_cons = (b_cons * 1000000) / 2500
 afy_yield_storm = (b_storm * 1000000) / 10000
 afy_cap_gw_recharge = (b_gw_recharge * 1000000) / 6000
@@ -100,15 +99,14 @@ imp_climate_loss = min(0.65, (warming * 0.12) + (precip_var / 100.0) * 0.35)
 storm_climate_loss = min(0.75, (warming * 0.05) + (precip_var / 100.0) * 0.55)
 gw_climate_loss = min(0.30, (warming * 0.05) + (precip_var / 100.0) * 0.15)
 
-# Reservoirs & Aquifer Banking cushion drought losses by capturing precipitation spikes
 storm_buffer_boost = min(afy_yield_storm * 0.4, afy_cap_storage * (precip_var / 100.0))
 actual_storm = max(0, (afy_yield_storm * (1 - storm_climate_loss)) + storm_buffer_boost)
 
 gw_bank_drawdown = min(afy_cap_gw_recharge * 0.5, net_demand_needed * 0.15)
 actual_gw = max(0, (fixed_gw_baseline * (1 - gw_climate_loss)) + gw_bank_drawdown)
 
-actual_rec = afy_yield_rec      # 100% Drought-Proof
-actual_desal = afy_yield_desal  # 100% Drought-Proof
+actual_rec = afy_yield_rec
+actual_desal = afy_yield_desal
 
 # Imported Water Gap Calculation
 target_imported_needed = max(0, net_demand_needed - (fixed_gw_baseline + afy_yield_storm + afy_cap_gw_recharge*0.2 + afy_yield_rec + afy_yield_desal))
@@ -148,12 +146,16 @@ with st.sidebar:
     if remaining_budget < 0:
         st.error("⚠️ **Fix Overbudget Status on main screen to view scores.**")
     else:
-        # Financial Profile Card
+        # Financial Profile Card (Shows both CapEx spent & O&M running costs)
         st.markdown(f"""
         <div class='metric-card' style='border-top-color: #3498db;'>
-            <div class='metric-title'>💰 Annual System O&M Cost</div>
-            <div class='metric-value'>${annual_om_cost / 1e9:.2f} Billion / yr</div>
-            <div class='metric-caption'>Avg Cost: <strong>${int(avg_cost_per_af):,}/AF</strong> (Baseline: ~$1,020)</div>
+            <div class='metric-title'>💰 Financial Summary</div>
+            <div class='metric-value'>${total_spent / 1000:.2f}B CapEx</div>
+            <div class='metric-caption'>
+                Upfront Capital Spent: <strong>${total_spent:,} Million</strong><br>
+                Annual System O&M Cost: <strong>${annual_om_cost / 1e9:.2f} Billion/yr</strong><br>
+                Avg Unit Cost: <strong>${int(avg_cost_per_af):,}/AF</strong>
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
