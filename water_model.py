@@ -4,58 +4,62 @@ import plotly.graph_objects as fgo
 # Page Setup
 st.set_page_config(layout="wide", page_title="LA County Water Portfolio Simulator ($10B Challenge)")
 
-# Custom CSS for modern dashboard styling
+# Custom Styling
 st.markdown("""
     <style>
     .main { background-color: #f8f9fa; }
     .metric-card {
         background-color: white;
-        padding: 18px;
+        padding: 16px;
         border-radius: 10px;
         box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        margin-bottom: 15px;
+        margin-bottom: 12px;
         border-top: 5px solid #3498db;
     }
-    .metric-title { font-size: 13px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
-    .metric-value { font-size: 26px; color: #2c3e50; font-weight: bold; margin: 4px 0; }
-    .metric-caption { font-size: 12px; color: #7f8c8d; }
+    .metric-title { font-size: 12px; color: #7f8c8d; font-weight: bold; text-transform: uppercase; }
+    .metric-value { font-size: 24px; color: #2c3e50; font-weight: bold; margin: 4px 0; }
+    .metric-caption { font-size: 11px; color: #7f8c8d; }
     .budget-tracker {
         background-color: #eaf2f8;
         padding: 15px;
         border-radius: 8px;
         border-left: 5px solid #2980b9;
-        margin-bottom: 20px;
+        margin-bottom: 15px;
     }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("🚰 LA County Water Resilience Challenge ($10B Capital Budget)")
-st.markdown("### **Mission Objective:** Eliminate LA's 930,000 AFY Imported Water Reliance before Climate Shocks hit.")
+st.markdown("### **Mission Objective:** Replace LA's 930,000 AFY Imported Water Gap using Local Infrastructure & Storage.")
 st.markdown("---")
 
 # MAIN CONTROLS PANEL
 st.markdown("## 💰 Step 1: Allocate Your $10 Billion Capital Budget")
 
-col1, col2 = st.columns(2)
+c1, c2 = st.columns(2)
 
-with col1:
-    b_cons = st.slider("Conservation & Efficiency ($ Millions)", 0, 10000, 1500, step=250, 
-                       help="$2,500 per AF saved | $1B buys 400,000 AFY saved")
-    b_storm = st.slider("Stormwater Capture Infrastructure ($ Millions)", 0, 10000, 1500, step=250, 
-                        help="$10,000 per AF capacity | $1B buys 100,000 AFY yield")
+with c1:
+    b_cons = st.slider("1. Demand Reduction & Conservation ($M)", 0, 10000, 1500, step=250, 
+                       help="CapEx: $2,500/AF | O&M: $350/AF | $1B = 400,000 AFY saved")
+    b_storm = st.slider("2. Stormwater Capture & Green Infra ($M)", 0, 10000, 1500, step=250, 
+                        help="CapEx: $10,000/AF | O&M: $900/AF | $1B = 100,000 AFY yield")
+    b_gw_recharge = st.slider("3. Groundwater Recharge & Aquifer Banking ($M)", 0, 10000, 1500, step=250, 
+                             help="CapEx: $6,000/AF | O&M: $650/AF | $1B = 166,666 AFY storage capacity")
 
-with col2:
-    b_rec = st.slider("Water Recycling / Potable Reuse ($ Millions)", 0, 10000, 4000, step=250, 
-                      help="$16,000 per AF capacity | $1B buys 62,500 AFY yield")
-    b_desal = st.slider("Ocean Desalination Buildout ($ Millions)", 0, 10000, 1000, step=250, 
-                        help="$25,000 per AF capacity | $1B buys 40,000 AFY yield")
+with c2:
+    b_storage = st.slider("4. Surface Storage Expansion / Reservoirs ($M)", 0, 10000, 1000, step=250, 
+                          help="CapEx: $12,000/AF | O&M: $500/AF | $1B = 83,333 AF atmospheric river buffer")
+    b_rec = st.slider("5. Water Recycling / Potable Reuse ($M)", 0, 10000, 3500, step=250, 
+                      help="CapEx: $16,000/AF | O&M: $1,850/AF | $1B = 62,500 AFY drought-proof yield")
+    b_desal = st.slider("6. Ocean Desalination Buildout ($M)", 0, 10000, 1000, step=250, 
+                        help="CapEx: $25,000/AF | O&M: $3,000/AF | $1B = 40,000 AFY yield")
 
 # Budget Accounting
-total_spent = b_cons + b_storm + b_rec + b_desal
+total_spent = b_cons + b_storm + b_gw_recharge + b_storage + b_rec + b_desal
 remaining_budget = 10000 - total_spent
 
 if remaining_budget < 0:
-    st.error(f"🚨 **BUDGET OVERRUN:** You have overspent by **${abs(remaining_budget):,} Million**! Rebalance your sliders to total $10,000M or less.")
+    st.error(f"🚨 **BUDGET OVERRUN:** Overspent by **${abs(remaining_budget):,} Million**! Rebalance sliders to total $10,000M or less.")
 else:
     st.markdown(f"""
     <div class='budget-tracker'>
@@ -76,65 +80,83 @@ with s_col2:
     precip_var = st.slider("Precipitation Variability / Chaos (%)", 0, 100, 30, step=5)
 
 # ENGINE LOGIC & CAPACITY CALCULATIONS
-# Convert Capital Spending ($ Millions) into Physical Yield (AFY) using Unit Costs
+# Convert Capital Spending ($M) to Physical Yield/Capacity (AFY) via CapEx metrics
 afy_saved_cons = (b_cons * 1000000) / 2500
 afy_yield_storm = (b_storm * 1000000) / 10000
+afy_cap_gw_recharge = (b_gw_recharge * 1000000) / 6000
+afy_cap_storage = (b_storage * 1000000) / 12000
 afy_yield_rec = (b_rec * 1000000) / 16000
 afy_yield_desal = (b_desal * 1000000) / 25000
 
-# Fixed Baseline Values
+# Fixed Baseline
 baseline_gross_demand = 1550000 * ((1 + (pop_growth / 100)) ** (target_year - 2026))
-fixed_gw_baseline = 511500  # Local Adjudicated Groundwater Yield
+fixed_gw_baseline = 511500  # Adjudicated natural groundwater yield
 
 # Net Demand after Conservation
 net_demand_needed = max(0, baseline_gross_demand - afy_saved_cons)
 
-# Climate Shock Reductions on Yield during Stress Events
+# Stress Event Losses & Buffer Boosts
 imp_climate_loss = min(0.65, (warming * 0.12) + (precip_var / 100.0) * 0.35)
 storm_climate_loss = min(0.75, (warming * 0.05) + (precip_var / 100.0) * 0.55)
 gw_climate_loss = min(0.30, (warming * 0.05) + (precip_var / 100.0) * 0.15)
 
-# Actual Available Local Supplies under Stress
-actual_gw = fixed_gw_baseline * (1 - gw_climate_loss)
-actual_storm = afy_yield_storm * (1 - storm_climate_loss)
+# Reservoirs & Aquifer Banking cushion drought losses by capturing precipitation spikes
+storm_buffer_boost = min(afy_yield_storm * 0.4, afy_cap_storage * (precip_var / 100.0))
+actual_storm = max(0, (afy_yield_storm * (1 - storm_climate_loss)) + storm_buffer_boost)
+
+gw_bank_drawdown = min(afy_cap_gw_recharge * 0.5, net_demand_needed * 0.15)
+actual_gw = max(0, (fixed_gw_baseline * (1 - gw_climate_loss)) + gw_bank_drawdown)
+
 actual_rec = afy_yield_rec      # 100% Drought-Proof
 actual_desal = afy_yield_desal  # 100% Drought-Proof
 
-total_local_supply_actual = actual_gw + actual_storm + actual_rec + actual_desal
-
-# Imported Water Gap Calculation (Imported Water fills whatever is left over)
-target_imported_needed = max(0, net_demand_needed - (fixed_gw_baseline + afy_yield_storm + afy_yield_rec + afy_yield_desal))
+# Imported Water Gap Calculation
+target_imported_needed = max(0, net_demand_needed - (fixed_gw_baseline + afy_yield_storm + afy_cap_gw_recharge*0.2 + afy_yield_rec + afy_yield_desal))
 actual_imported_available = target_imported_needed * (1 - imp_climate_loss)
 
-# Deficit & Resiliency Metrics
-total_water_delivered = total_local_supply_actual + actual_imported_available
+# Totals & Resiliency
+total_water_delivered = actual_gw + actual_storm + actual_rec + actual_desal + actual_imported_available
 supply_coverage_ratio = total_water_delivered / net_demand_needed if net_demand_needed > 0 else 1.0
 
-# Resiliency Score Calculation (0 - 100)
 resiliency_score = int(supply_coverage_ratio * 100)
-# Penalty for heavy reliance on imported water
 imported_share = (target_imported_needed / net_demand_needed) if net_demand_needed > 0 else 0
 if imported_share > 0.40:
-    resiliency_score -= int((imported_share - 0.40) * 50)
+    resiliency_score -= int((imported_share - 0.40) * 45)
 resiliency_score = max(min(resiliency_score, 100), 5)
 
-# Total Annual O&M Cost ($)
-annual_om_cost = (target_imported_needed * 1250 * (1 + warming * 0.02)) + (fixed_gw_baseline * 850) + \
-                 (afy_yield_rec * 1850) + (afy_yield_storm * 900) + (afy_yield_desal * 3000) + (afy_saved_cons * 350)
+# Financial Calculations: Annual Operations & Maintenance (O&M) Cost
+annual_om_cost = (target_imported_needed * 1250 * (1 + warming * 0.02)) + \
+                 (fixed_gw_baseline * 850) + \
+                 (afy_yield_rec * 1850) + \
+                 (afy_yield_storm * 900) + \
+                 (afy_cap_gw_recharge * 650) + \
+                 (afy_cap_storage * 500) + \
+                 (afy_yield_desal * 3000) + \
+                 (afy_saved_cons * 350)
+
 avg_cost_per_af = annual_om_cost / baseline_gross_demand if baseline_gross_demand > 0 else 0
 
 # Environmental Score (0 - 100, Lower is Better)
 env_score = int(((target_imported_needed * 0.7) + (fixed_gw_baseline * 0.3) + (afy_yield_rec * 0.2) + \
-                 (afy_yield_storm * 0.1) + (afy_yield_desal * 1.0)) / (net_demand_needed + 1) * 100)
+                 (afy_yield_storm * 0.1) + (afy_cap_storage * 0.4) + (afy_yield_desal * 1.0)) / (net_demand_needed + 1) * 100)
 env_score = max(min(env_score, 100), 5)
 
-# SIDEBAR OUTPUTS PANEL (LOCKED TO SIDEBAR)
+# SIDEBAR OUTPUTS PANEL
 with st.sidebar:
     st.markdown("## 📊 Portfolio Evaluation")
     
     if remaining_budget < 0:
         st.error("⚠️ **Fix Overbudget Status on main screen to view scores.**")
     else:
+        # Financial Profile Card
+        st.markdown(f"""
+        <div class='metric-card' style='border-top-color: #3498db;'>
+            <div class='metric-title'>💰 Annual System O&M Cost</div>
+            <div class='metric-value'>${annual_om_cost / 1e9:.2f} Billion / yr</div>
+            <div class='metric-caption'>Avg Cost: <strong>${int(avg_cost_per_af):,}/AF</strong> (Baseline: ~$1,020)</div>
+        </div>
+        """, unsafe_allow_html=True)
+
         # Resiliency Card
         res_color = "🟢 High Resiliency" if resiliency_score >= 85 else ("🟡 Moderate Risk" if resiliency_score >= 65 else "🔴 Severe Supply Crisis")
         st.markdown(f"""
@@ -166,20 +188,22 @@ with st.sidebar:
         </div>
         """, unsafe_allow_html=True)
 
-        # Donut Chart of Supply Mix
-        st.markdown("### Planned Supply Mix (AFY)")
+        # Donut Chart
+        st.markdown("### Planned Supply & Storage Mix")
         fig = fgo.Figure(data=[fgo.Pie(
-            labels=['Imported Gap', 'Groundwater', 'New Recycling', 'New Stormwater', 'Ocean Desal'], 
-            values=[target_imported_needed, fixed_gw_baseline, afy_yield_rec, afy_yield_storm, afy_yield_desal], 
-            hole=.4,
-            marker=dict(colors=['#e67e22', '#2ecc71', '#9b59b6', '#f1c40f', '#e74c3c'])
+            labels=['Imported Gap', 'Groundwater', 'Stormwater', 'GW Recharge Bank', 'Reservoir Buffer', 'Recycling', 'Ocean Desal'], 
+            values=[target_imported_needed, fixed_gw_baseline, afy_yield_storm, afy_cap_gw_recharge, afy_cap_storage, afy_yield_rec, afy_yield_desal], 
+            hole=.35,
+            marker=dict(colors=['#e67e22', '#2ecc71', '#f1c40f', '#27ae60', '#34495e', '#9b59b6', '#e74c3c'])
         )])
-        fig.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=200, showlegend=True)
+        fig.update_layout(margin=dict(t=10, b=10, l=10, r=10), height=210, showlegend=True)
         st.plotly_chart(fig, use_container_width=True)
 
         # Physical Alerts
         st.markdown("### ⚠️ Physical Engineering Alerts")
-        if b_storm > 2500: st.warning("**Stormwater Ceiling:** LA lacks physical land area to capture this much runoff.")
-        if b_rec > 7000: st.warning("**Effluent Limitation:** Capital exceeds total municipal wastewater available to recycle.")
-        if b_desal > 2000: st.warning("**Regulatory Wall:** High energy use & Coastal Commission opposition likely.")
-        if b_cons > 3000: st.warning("**Public Fatigue:** High conservation targets risk public compliance failure.")
+        if b_storm > 2500: st.warning("**Stormwater Ceiling:** LA lacks urban land area to capture this much runoff.")
+        if b_gw_recharge > 3000: st.warning("**Aquifer Capacity Limit:** Recharge exceeds local basin storage limits.")
+        if b_storage > 2500: st.warning("**Topographic Barrier:** High land cost and environmental permitting hurdles for dams/reservoirs.")
+        if b_rec > 6000: st.warning("**Effluent Limitation:** Capital exceeds total municipal wastewater baseline.")
+        if b_desal > 2000: st.warning("**Regulatory Wall:** High energy grid load & Coastal Commission blocking.")
+        if b_cons > 3000: st.warning("**Public Fatigue:** High conservation targets risk compliance failure.")
