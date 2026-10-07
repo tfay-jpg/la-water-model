@@ -53,14 +53,14 @@ with c1:
         """)
 
     # 2. STORMWATER CAPTURE
-    b_storm = st.slider("2. Stormwater Capture & Green Infra ($M)", 0, 10000, 0, step=250, 
+    b_storm = st.slider("2. Urban Stormwater Capture & Spreading Grounds ($M)", 0, 10000, 0, step=250, 
                         help="CapEx: $10,000/AF | O&M: $900/AF | $1B = 100,000 AFY yield")
-    with st.expander("ℹ️ Strategy Guide: Stormwater Capture"):
+    with st.expander("ℹ️ Strategy Guide: Urban Stormwater Capture"):
         st.markdown("""
-        * **The Mechanism:** Spreading grounds, permeable pavements, bioswales, and urban park basins to catch rainwater runoff.
-        * **Cost Profile:** **Moderate CapEx ($10,000/AF).** Requires significant urban land acquisition and engineering.
-        * **Resilience & Reliability:** **Weather-Dependent.** Yield spikes during wet years/atmospheric rivers, but collapses during multi-year droughts.
-        * **Eco & Social Impact:** Excellent local co-benefits (urban green spaces, reduced street flooding, filtered ocean runoff).
+        * **The Mechanism:** Spreading grounds, permeable pavements, bioswales, and urban park basins that filter street runoff and recharge aquifers.
+        * **Cost Profile:** **Moderate CapEx ($10,000/AF).** Requires urban land acquisition and subsurface drainage engineering.
+        * **Resilience & Reliability:** **Weather-Dependent.** Feeds groundwater basins during storm events, but yield drops during prolonged multi-year droughts.
+        * **Eco & Social Impact:** Excellent local co-benefits (green spaces, flood control, reduced urban runoff pollution in coastal bays).
         """)
 
     # 3. GROUNDWATER RECHARGE
@@ -68,9 +68,9 @@ with c1:
                              help="CapEx: $6,000/AF | O&M: $650/AF | $1B = 166,666 AFY storage capacity")
     with st.expander("ℹ️ Strategy Guide: Aquifer Banking & Recharge"):
         st.markdown("""
-        * **The Mechanism:** Deep injection wells and spreading basins that store excess winter surface water deep underground.
+        * **The Mechanism:** Deep injection wells and spreading basins that store surface water deep underground in subterranean basins.
         * **Cost Profile:** **Low-to-Moderate CapEx ($6,000/AF).** Utilizes natural subterranean geology as free storage reservoirs.
-        * **Resilience & Reliability:** **Critical Drought Buffer.** Allows LA to draw down banked reserves when surface supplies dry up.
+        * **Resilience & Reliability:** **Critical Drought Buffer.** Allows LA to draw down banked subterranean reserves when surface supplies dry up.
         * **Eco & Social Impact:** Prevents basin overdraft, land subsidence (sinking ground), and seawater intrusion into coastal freshwater aquifers.
         """)
 
@@ -78,14 +78,14 @@ with c2:
     st.markdown("#### **Storage Expansion & Tech Yield**")
 
     # 4. SURFACE STORAGE
-    b_storage = st.slider("4. Surface Storage Expansion / Reservoirs ($M)", 0, 10000, 0, step=250, 
-                          help="CapEx: $12,000/AF | O&M: $500/AF | $1B = 83,333 AF atmospheric river buffer")
-    with st.expander("ℹ️ Strategy Guide: Reservoirs & Surface Storage"):
+    b_storage = st.slider("4. Foothill Reservoirs & Surface Storage ($M)", 0, 10000, 0, step=250, 
+                          help="CapEx: $12,000/AF | O&M: $500/AF | $1B = 83,333 AF mountain watershed runoff capture")
+    with st.expander("ℹ️ Strategy Guide: Foothill Reservoirs & Surface Storage"):
         st.markdown("""
-        * **The Mechanism:** Expanding dam heights, building off-stream reservoirs, and upgrading flood-control basins.
-        * **Cost Profile:** **High CapEx ($12,000/AF).** High civil engineering and land purchase costs.
-        * **Resilience & Reliability:** Essential for capturing flash-flood surges from intense **Atmospheric Rivers** caused by climate change.
-        * **Eco & Social Impact:** High environmental impact due to land flooding, ecosystem disruption, and heavy state permitting barriers.
+        * **The Mechanism:** Expanding dam heights, foothill catch basins, and off-stream reservoirs to capture direct precipitation and mountain runoff.
+        * **Cost Profile:** **High CapEx ($12,000/AF).** Heavy civil engineering and land purchase costs in foothill corridors.
+        * **Resilience & Reliability:** **Direct Local Yield & Buffer.** Captures mountain runoff directly for surface treatment and provides drought carryover storage.
+        * **Eco & Social Impact:** High environmental impact due to canyon flooding, sediment trapping, river ecosystem disruption, and strict permitting barriers.
         """)
 
     # 5. WATER RECYCLING
@@ -150,26 +150,29 @@ fixed_gw_baseline = 511500  # Adjudicated natural groundwater yield
 # Net Demand after Conservation
 net_demand_needed = max(0, baseline_gross_demand - afy_saved_cons)
 
-# Stress Event Losses & Buffer Boosts
+# Stress Event Losses
 imp_climate_loss = min(0.65, (warming * 0.12) + (precip_var / 100.0) * 0.35)
 storm_climate_loss = min(0.75, (warming * 0.05) + (precip_var / 100.0) * 0.55)
 gw_climate_loss = min(0.30, (warming * 0.05) + (precip_var / 100.0) * 0.15)
+reservoir_evap_loss = min(0.30, warming * 0.06)
 
-storm_buffer_boost = min(afy_yield_storm * 0.4, afy_cap_storage * (precip_var / 100.0))
-actual_storm = max(0, (afy_yield_storm * (1 - storm_climate_loss)) + storm_buffer_boost)
+# 1. Surface Storage (Foothill Reservoirs): Directly yields water captured from mountain runoff + acts as drought carryover buffer
+actual_storage_yield = afy_cap_storage * (1 - reservoir_evap_loss)
 
-gw_bank_drawdown = min(afy_cap_gw_recharge * 0.5, net_demand_needed * 0.15)
+# 2. Stormwater Capture + Groundwater Recharge: Urban runoff captured in spreading grounds feeds underground aquifer banks
+gw_bank_drawdown = min((afy_cap_gw_recharge + (afy_yield_storm * 0.5)) * 0.5, net_demand_needed * 0.20)
 actual_gw = max(0, (fixed_gw_baseline * (1 - gw_climate_loss)) + gw_bank_drawdown)
 
+actual_storm_direct = afy_yield_storm * (1 - storm_climate_loss) * 0.5
 actual_rec = afy_yield_rec
 actual_desal = afy_yield_desal
 
 # Imported Water Gap Calculation
-target_imported_needed = max(0, net_demand_needed - (fixed_gw_baseline + afy_yield_storm + afy_cap_gw_recharge*0.2 + afy_yield_rec + afy_yield_desal))
+target_imported_needed = max(0, net_demand_needed - (fixed_gw_baseline + afy_yield_storm + afy_cap_gw_recharge*0.2 + afy_cap_storage + afy_yield_rec + afy_yield_desal))
 actual_imported_available = target_imported_needed * (1 - imp_climate_loss)
 
 # Totals & Resiliency
-total_water_delivered = actual_gw + actual_storm + actual_rec + actual_desal + actual_imported_available
+total_water_delivered = actual_gw + actual_storm_direct + actual_storage_yield + actual_rec + actual_desal + actual_imported_available
 supply_coverage_ratio = total_water_delivered / net_demand_needed if net_demand_needed > 0 else 1.0
 
 resiliency_score = int(supply_coverage_ratio * 100)
@@ -192,7 +195,7 @@ avg_cost_per_af = annual_om_cost / baseline_gross_demand if baseline_gross_deman
 
 # Environmental Score (0 - 100, Lower is Better)
 env_score = int(((target_imported_needed * 0.7) + (fixed_gw_baseline * 0.3) + (afy_yield_rec * 0.2) + \
-                 (afy_yield_storm * 0.1) + (afy_cap_storage * 0.4) + (afy_yield_desal * 1.0)) / (net_demand_needed + 1) * 100)
+                 (afy_yield_storm * 0.1) + (afy_cap_storage * 0.5) + (afy_yield_desal * 1.0)) / (net_demand_needed + 1) * 100)
 env_score = max(min(env_score, 100), 5)
 
 # SIDEBAR OUTPUTS PANEL
@@ -249,8 +252,8 @@ with st.sidebar:
         # Donut Chart
         st.markdown("### Planned Supply & Storage Mix")
         fig = fgo.Figure(data=[fgo.Pie(
-            labels=['Imported Gap', 'Groundwater', 'Stormwater', 'GW Recharge Bank', 'Reservoir Buffer', 'Recycling', 'Ocean Desal'], 
-            values=[target_imported_needed, fixed_gw_baseline, afy_yield_storm, afy_cap_gw_recharge, afy_cap_storage, afy_yield_rec, afy_yield_desal], 
+            labels=['Imported Gap', 'Groundwater', 'Stormwater Grounds', 'GW Recharge Bank', 'Foothill Reservoir Yield', 'Recycling', 'Ocean Desal'], 
+            values=[target_imported_needed, fixed_gw_baseline, actual_storm_direct, afy_cap_gw_recharge, actual_storage_yield, afy_yield_rec, afy_yield_desal], 
             hole=.35,
             marker=dict(colors=['#e67e22', '#2ecc71', '#f1c40f', '#27ae60', '#34495e', '#9b59b6', '#e74c3c'])
         )])
