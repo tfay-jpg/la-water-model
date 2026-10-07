@@ -44,22 +44,34 @@ with c1:
     # 1. INDOOR CONSERVATION
     b_cons_in = st.slider("1. Water Conservation & Demand Reduction (Indoors) ($M)", 0, 10000, 0, step=250, help="CapEx: $2,000/AF | O&M: $250/AF | $1B = 500,000 AFY saved")
     with st.expander("ℹ️ Strategy Guide: Indoor Water Conservation"):
-        st.markdown("* **The Mechanism:** High-efficiency toilet retrofits, low-flow showerheads, commercial appliance standards, and municipal leak detection.\n* **Cost Profile:** Lowest CapEx ($2,000/AF). High volume savings per dollar spent.\n* **Resilience & Reliability:** Constant year-round savings; unaffected by weather or climate shocks.\n* **Eco & Social Impact:** Excellent environmental score; reduces indoor wastewater volume sent to treatment plants.")
+        st.write("- **The Mechanism:** High-efficiency toilet retrofits, low-flow showerheads, commercial appliance standards, and municipal leak detection.")
+        st.write("- **Cost Profile:** **Lowest CapEx ($2,000/AF).** High volume savings per dollar spent.")
+        st.write("- **Resilience & Reliability:** Constant year-round savings; unaffected by weather or climate shocks.")
+        st.write("- **Eco & Social Impact:** Excellent environmental score; reduces indoor wastewater volume sent to treatment plants.")
 
     # 2. LANDSCAPE TRANSFORMATION
     b_cons_out = st.slider("2. Landscape Transformation / Outdoor Water Reduction ($M)", 0, 10000, 0, step=250, help="CapEx: $3,000/AF | O&M: $400/AF | $1B = 333,333 AFY saved")
     with st.expander("ℹ️ Strategy Guide: Outdoor Landscape Transformation"):
-        st.markdown("* **The Mechanism:** Turf replacement rebates (grass removal), native/drought-tolerant landscaping, and smart irrigation controllers.\n* **Cost Profile:** Low CapEx ($3,000/AF). Turf removal is more labor-intensive than indoor appliance retrofits.\n* **Resilience & Reliability:** Significantly reduces outdoor summer peak water demand.\n* **Eco & Social Impact:** Supports local biodiversity, reduces urban heat island effect, and prevents pesticide runoff into storm drains.")
+        st.write("- **The Mechanism:** Turf replacement rebates (grass removal), native/drought-tolerant landscaping, and smart irrigation controllers.")
+        st.write("- **Cost Profile:** **Low CapEx ($3,000/AF).** Turf removal is more labor-intensive than indoor appliance retrofits.")
+        st.write("- **Resilience & Reliability:** Significantly reduces outdoor summer peak water demand.")
+        st.write("- **Eco & Social Impact:** Supports local biodiversity, reduces urban heat island effect, and prevents pesticide runoff into storm drains.")
 
     # 3. STORMWATER CAPTURE
     b_storm = st.slider("3. Stormwater Capture & Passive Infiltration ($M)", 0, 10000, 0, step=250, help="CapEx: $10,000/AF | O&M: $900/AF | $1B = 100,000 AFY yield")
     with st.expander("ℹ️ Strategy Guide: Stormwater Capture & Spreading Grounds"):
-        st.markdown("* **The Mechanism:** Spreading grounds, unpaved basins, bioswales, and permeable street pavement that catch urban runoff and let it passively soak into shallow aquifers.\n* **Cost Profile:** Moderate CapEx ($10,000/AF). Requires urban land acquisition and surface drainage structures.\n* **Resilience & Reliability:** Weather-Dependent. Captures massive storm surges during wet years, but yield drops during multi-year droughts.\n* **Eco & Social Impact:** High local co-benefits (urban park greening, street flood control, reduced ocean runoff pollution).")
+        st.write("- **The Mechanism:** Spreading grounds, unpaved basins, bioswales, and permeable street pavement that catch urban runoff and let it passively soak into shallow aquifers.")
+        st.write("- **Cost Profile:** **Moderate CapEx ($10,000/AF).** Requires urban land acquisition and surface drainage structures.")
+        st.write("- **Resilience & Reliability:** **Weather-Dependent.** Captures massive storm surges during wet years, but yield drops during multi-year droughts.")
+        st.write("- **Eco & Social Impact:** High local co-benefits (urban park greening, street flood control, reduced ocean runoff pollution).")
 
     # 4. UPSTREAM RESERVOIRS & STORAGE
     b_storage = st.slider("4. Increasing Upstream Rainwater Storage / Reservoirs ($M)", 0, 10000, 0, step=250, help="CapEx: $12,000/AF | O&M: $500/AF | $1B = 83,333 AF atmospheric river runoff capture")
     with st.expander("ℹ️ Strategy Guide: Upstream Reservoirs & Storage"):
-        st.markdown("* **The Mechanism:** Expanding dam heights, foothill catch basins, and off-stream reservoirs to capture direct mountain watershed precipitation and snowmelt.\n* **Cost Profile:** High CapEx ($12,000/AF). High civil engineering and land purchase costs in canyon corridors.\n* **Resilience & Reliability:** Direct Local Yield & Buffer. Essential for capturing flash-flood surges from intense atmospheric rivers.\n* **Eco & Social Impact:** High environmental impact due to canyon flooding, sediment trapping, and river ecosystem disruption.")
+        st.write("- **The Mechanism:** Expanding dam heights, foothill catch basins, and off-stream reservoirs to capture direct mountain watershed precipitation and snowmelt.")
+        st.write("- **Cost Profile:** **High CapEx ($12,000/AF).** High civil engineering and land purchase costs in canyon corridors.")
+        st.write("- **Resilience & Reliability:** **Direct Local Yield & Buffer.** Essential for capturing flash-flood surges from intense atmospheric rivers.")
+        st.write("- **Eco & Social Impact:** High environmental impact due to canyon flooding, sediment trapping, and river ecosystem disruption.")
 
 with c2:
     st.markdown("#### **Tech Yield & Subterranean Banking**")
@@ -67,50 +79,5 @@ with c2:
     # 5. AQUIFER BANKING & DEEP WELL INJECTION
     b_gw_recharge = st.slider("5. Aquifer Banking & Deep Well Injection ($M)", 0, 10000, 0, step=250, help="CapEx: $6,000/AF | O&M: $650/AF | $1B = 166,666 AFY storage capacity")
     with st.expander("ℹ️ Strategy Guide: Aquifer Banking & Deep Well Injection"):
-        st.markdown("* **The Mechanism:** High-pressure injection wells that actively pump treated surface water deep underground into subterranean aquifers for long-term storage and drought recovery.\n* **Cost Profile:** Moderate CapEx ($6,000/AF). Uses natural geology as a free subterranean storage tank.\n* **Resilience & Reliability:** Critical Drought Buffer. Acts as a multi-year 'water bank account' to pump out when surface water dries up.\n* **Eco & Social Impact:** Prevents basin overdraft, land sinking (subsidence), and ocean saltwater intrusion into coastal freshwater wells.")
-
-    # 6. WATER RECYCLING FOR POTABLE REUSE
-    b_rec = st.slider("6. Wastewater Recycling for Potable Reuse ($M)", 0, 10000, 0, step=250, help="CapEx: $16,000/AF | O&M: $1,850/AF | $1B = 62,500 AFY drought-proof yield")
-    with st.expander("ℹ️ Strategy Guide: Wastewater Recycling for Potable Reuse"):
-        st.markdown("* **The Mechanism:** Advanced purification (microfiltration, reverse osmosis, UV) of municipal wastewater for indirect/direct drinking water supply (e.g., Pure Water Los Angeles).\n* **Cost Profile:** High CapEx ($16,000/AF) and High O&M ($1,850/AF) due to complex treatment infrastructure and continuous electricity demands.\n* **Resilience & Reliability:** 100% Drought-Proof. Municipal wastewater flows 24/7/365 regardless of weather or precipitation.\n* **Eco & Social Impact:** Prevents treated wastewater effluent from polluting coastal bays; highly accepted by water planners.")
-
-    # 7. OCEAN DESALINATION
-    b_desal = st.slider("7. Desalination of Seawater ($M)", 0, 10000, 0, step=250, help="CapEx: $25,000/AF | O&M: $3,000/AF | $1B = 40,000 AFY yield")
-    with st.expander("ℹ️ Strategy Guide: Seawater Desalination"):
-        st.markdown("* **The Mechanism:** Coastal treatment plants forcing seawater through high-pressure membranes to remove salt and minerals.\n* **Cost Profile:** Highest CapEx ($25,000/AF) and Highest O&M ($3,000/AF). Extremely expensive to build and operate.\n* **Resilience & Reliability:** Unlimited Local Yield. Completely independent of weather, snowpack, or rainfall patterns.\n* **Eco & Social Impact:** Worst Environmental Score. Heavy grid energy demand, carbon footprint, marine organism intake impacts, and toxic brine discharge.")
-
-# Budget Accounting Variables
-total_spent = b_cons_in + b_cons_out + b_storm + b_storage + b_gw_recharge + b_rec + b_desal
-remaining_budget = 10000 - total_spent
-
-if remaining_budget < 0:
-    st.error(f"🚨 **BUDGET OVERRUN:** Overspent by **${abs(remaining_budget):,} Million**! Rebalance sliders to total $10,000M or less.")
-else:
-    st.markdown(f"""
-    <div class='budget-tracker'>
-        <strong>Capital Budget Status:</strong> Spent <strong>${total_spent:,} Million</strong> of $10,000 Million | 
-        Unallocated Reserve: <strong>${remaining_budget:,} Million</strong>
-    </div>
-    """, unsafe_allow_html=True)
-
-st.markdown("---")
-st.markdown("## 🌡️ Step 2: Set Future Environmental Stressors")
-
-s_col1, s_col2 = st.columns(2)
-with s_col1:
-    target_year = st.slider("Target Planning Horizon Year", 2026, 2060, 2026, step=1)
-    pop_growth = st.slider("Annual Population Growth Rate (%)", -0.5, 1.5, 0.0, step=0.1)
-with s_col2:
-    warming = st.slider("Climate Warming / Temp Rise (°C)", 0.0, 4.0, 0.0, step=0.1)
-    precip_var = st.slider("Precipitation Variability / Chaos (%)", 0, 100, 0, step=5)
-
-# ENGINE LOGIC & CAPACITY CALCULATIONS
-afy_saved_in = (b_cons_in * 1000000) / 2000
-afy_saved_out = (b_cons_out * 1000000) / 3000
-total_afy_saved = afy_saved_in + afy_saved_out
-
-afy_yield_storm = (b_storm * 1000000) / 10000
-afy_cap_storage = (b_storage * 1000000) / 12000
-afy_cap_gw_recharge = (b_gw_recharge * 1000000) / 6000
-afy_yield_rec = (b_rec * 1000000) / 16000
-afy_yield_desal = (b_desal * 1
+        st.write("- **The Mechanism:** High-pressure injection wells that actively pump treated surface water deep underground into subterranean aquifers for long-term storage and drought recovery.")
+        st.write("- **
