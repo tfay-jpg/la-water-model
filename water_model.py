@@ -42,7 +42,7 @@ with c1:
     st.markdown("#### **Demand Reduction & Catchment**")
     
     # 1. INDOOR CONSERVATION
-    b_cons_in = st.slider("1. Indoor Water Conservation & Efficiency ($M)", 0, 10000, 0, step=250, 
+    b_cons_in = st.slider("1. Water Conservation & Demand Reduction (Indoors) ($M)", 0, 10000, 0, step=250, 
                           help="CapEx: $2,000/AF | O&M: $250/AF | $1B = 500,000 AFY saved")
     with st.expander("ℹ️ Strategy Guide: Indoor Water Conservation"):
         st.markdown("""
@@ -53,7 +53,7 @@ with c1:
         """)
 
     # 2. LANDSCAPE TRANSFORMATION
-    b_cons_out = st.slider("2. Outdoor Landscape Transformation ($M)", 0, 10000, 0, step=250, 
+    b_cons_out = st.slider("2. Landscape Transformation / Outdoor Water Reduction ($M)", 0, 10000, 0, step=250, 
                            help="CapEx: $3,000/AF | O&M: $400/AF | $1B = 333,333 AFY saved")
     with st.expander("ℹ️ Strategy Guide: Outdoor Landscape Transformation"):
         st.markdown("""
@@ -63,8 +63,8 @@ with c1:
         * **Eco & Social Impact:** Supports local biodiversity, reduces urban heat island effect, and prevents pesticide runoff into storm drains.
         """)
 
-    # 3. STORMWATER CAPTURE & PASSIVE INFILTRATION
-    b_storm = st.slider("3. Stormwater Capture & Spreading Grounds ($M)", 0, 10000, 0, step=250, 
+    # 3. STORMWATER CAPTURE
+    b_storm = st.slider("3. Stormwater Capture & Passive Infiltration ($M)", 0, 10000, 0, step=250, 
                         help="CapEx: $10,000/AF | O&M: $900/AF | $1B = 100,000 AFY yield")
     with st.expander("ℹ️ Strategy Guide: Stormwater Capture & Spreading Grounds"):
         st.markdown("""
@@ -75,7 +75,7 @@ with c1:
         """)
 
     # 4. UPSTREAM RESERVOIRS & STORAGE
-    b_storage = st.slider("4. Upstream Rainwater Storage / Reservoirs ($M)", 0, 10000, 0, step=250, 
+    b_storage = st.slider("4. Increasing Upstream Rainwater Storage / Reservoirs ($M)", 0, 10000, 0, step=250, 
                           help="CapEx: $12,000/AF | O&M: $500/AF | $1B = 83,333 AF atmospheric river runoff capture")
     with st.expander("ℹ️ Strategy Guide: Upstream Reservoirs & Storage"):
         st.markdown("""
@@ -111,7 +111,7 @@ with c2:
         """)
 
     # 7. OCEAN DESALINATION
-    b_desal = st.slider("7. Seawater Desalination Buildout ($M)", 0, 10000, 0, step=250, 
+    b_desal = st.slider("7. Desalination of Seawater ($M)", 0, 10000, 0, step=250, 
                         help="CapEx: $25,000/AF | O&M: $3,000/AF | $1B = 40,000 AFY yield")
     with st.expander("ℹ️ Strategy Guide: Seawater Desalination"):
         st.markdown("""
@@ -140,11 +140,12 @@ st.markdown("## 🌡️ Step 2: Set Future Environmental Stressors")
 
 s_col1, s_col2 = st.columns(2)
 with s_col1:
-    target_year = st.slider("Target Planning Horizon Year", 2026, 2060, 2040, step=1)
-    pop_growth = st.slider("Annual Population Growth Rate (%)", -0.5, 1.5, 0.4, step=0.1)
+    # Set default starting horizon to 2026 and 0.0% growth so baseline starts cleanly at 930k AFY
+    target_year = st.slider("Target Planning Horizon Year", 2026, 2060, 2026, step=1)
+    pop_growth = st.slider("Annual Population Growth Rate (%)", -0.5, 1.5, 0.0, step=0.1)
 with s_col2:
-    warming = st.slider("Climate Warming / Temp Rise (°C)", 0.0, 4.0, 1.5, step=0.1)
-    precip_var = st.slider("Precipitation Variability / Chaos (%)", 0, 100, 30, step=5)
+    warming = st.slider("Climate Warming / Temp Rise (°C)", 0.0, 4.0, 0.0, step=0.1)
+    precip_var = st.slider("Precipitation Variability / Chaos (%)", 0, 100, 0, step=5)
 
 # ENGINE LOGIC & CAPACITY CALCULATIONS
 # Convert Capital Spending ($M) to Physical Yield/Savings (AFY) via CapEx metrics
