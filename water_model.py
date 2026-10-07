@@ -140,7 +140,6 @@ st.markdown("## 🌡️ Step 2: Set Future Environmental Stressors")
 
 s_col1, s_col2 = st.columns(2)
 with s_col1:
-    # Set default starting horizon to 2026 and 0.0% growth so baseline starts cleanly at 930k AFY
     target_year = st.slider("Target Planning Horizon Year", 2026, 2060, 2026, step=1)
     pop_growth = st.slider("Annual Population Growth Rate (%)", -0.5, 1.5, 0.0, step=0.1)
 with s_col2:
@@ -161,7 +160,9 @@ afy_yield_desal = (b_desal * 1000000) / 25000
 
 # Fixed Baseline
 baseline_gross_demand = 1550000 * ((1 + (pop_growth / 100)) ** (target_year - 2026))
-fixed_gw_baseline = 511500  # Adjudicated natural groundwater yield
+
+# Fixed local baseline supplies set to 620,000 AFY so imported gap equals exactly 930,000 AFY at $0
+fixed_gw_baseline = 620000  
 
 # Net Demand after Total Conservation
 net_demand_needed = max(0, baseline_gross_demand - total_afy_saved)
